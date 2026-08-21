@@ -188,8 +188,8 @@ app.get('/dashboard', (req, res) => {
 // 5. ЗАПУСК
 // ============================================================
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`🚀 Сервер запущен на http://localhost:${PORT}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Сервер запущен на порту ${PORT}`);
     console.log(`🔑 Тестовый вход: user@example.com / password123`);
 });
