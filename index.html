@@ -18,7 +18,6 @@
             min-height: 100vh;
         }
         
-        /* ===== АВТОРИЗАЦИЯ ===== */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -183,7 +182,6 @@
             text-decoration: underline;
         }
         
-        /* ===== ШАПКА ===== */
         .navbar {
             background: #ffffff;
             border-bottom: 1px solid #e8ecf1;
@@ -313,7 +311,6 @@
             border-color: #fecaca;
         }
         
-        /* ===== КОНТЕЙНЕР ===== */
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -795,12 +792,12 @@
         <form id="authForm">
             <div class="form-group">
                 <label>Email <span class="hint">(6-50 символов)</span></label>
-                <input type="email" id="authEmail" placeholder="user@example.com">
+                <input type="email" id="authEmail" placeholder="user@example.com" value="user@example.com">
                 <div class="error-text" id="authEmailError">Email должен содержать от 6 до 50 символов</div>
             </div>
             <div class="form-group">
                 <label>Пароль <span class="hint">(6-50 символов)</span></label>
-                <input type="password" id="authPassword" placeholder="Введите пароль">
+                <input type="password" id="authPassword" placeholder="Введите пароль" value="password123">
                 <div class="error-text" id="authPasswordError">Пароль должен содержать от 6 до 50 символов</div>
             </div>
             <button type="submit" class="btn btn-primary" id="authBtn">Войти</button>
@@ -1053,6 +1050,7 @@
     let isAuthMode = 'login';
     let myProfiles = [];
     let editingId = null;
+    const API_URL = 'http://localhost:3000';
 
     // ================================================================
     // 2. ВАЛИДАЦИЯ
@@ -1096,8 +1094,12 @@
         console.log(`[${time}] ${message}`);
     }
 
+    function getCurrentUser() {
+        return currentUser;
+    }
+
     // ================================================================
-    // 4. РАБОТА С СЕССИЕЙ (НОВОЕ!)
+    // 4. РАБОТА С СЕССИЕЙ
     // ================================================================
     function saveSession(user) {
         try {
@@ -1124,14 +1126,10 @@
     }
 
     // ================================================================
-    // 5. РАБОТА С ХРАНИЛИЩЕМ
+    // 5. РАБОТА С ХРАНИЛИЩЕМ (только для пользователей)
     // ================================================================
     function getUsersKey() {
         return 'taskflow_users';
-    }
-
-    function getProfilesKey(email) {
-        return `taskflow_profiles_${email}`;
     }
 
     function loadUsers() {
@@ -1147,26 +1145,107 @@
         localStorage.setItem(getUsersKey(), JSON.stringify(users));
     }
 
-    function loadProfiles(email) {
-        try {
-            const data = localStorage.getItem(getProfilesKey(email));
-            return data ? JSON.parse(data) : [];
-        } catch {
-            return [];
-        }
-    }
-
-    function saveProfiles(email, profiles) {
-        localStorage.setItem(getProfilesKey(email), JSON.stringify(profiles));
-    }
-
     function findUser(email) {
         const users = loadUsers();
         return users.find(u => u.email === email);
     }
 
     // ================================================================
-    // 6. АВТОРИЗАЦИЯ
+    // 6. РАБОТА С БЕКЕНДОМ (API)
+    // ================================================================
+
+    // GET /profiles — получить все профили с сервера
+    async function fetchProfiles() {
+        try {
+            const user = getCurrentUser();
+            if (!user) {
+                log('❌ Пользователь не авторизован');
+                return [];
+            }
+
+            console.log(`📤 GET ${API_URL}/profiles`);
+            const response = await fetch(`${API_URL}/profiles`, {
+                headers: {
+                    'X-User-Email': user.email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Профили загружены с сервера:', data);
+            return data;
+        } catch (error) {
+            console.error('❌ Ошибка загрузки профилей:', error);
+            return [];
+        }
+    }
+
+    // POST /profiles — создать профиль на сервере
+    async function createProfileOnServer(profileData) {
+        try {
+            const user = getCurrentUser();
+            if (!user) {
+                log('❌ Пользователь не авторизован');
+                return null;
+            }
+
+            console.log(`📤 POST ${API_URL}/profiles`, profileData);
+            const response = await fetch(`${API_URL}/profiles`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Email': user.email
+                },
+                body: JSON.stringify(profileData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Профиль создан на сервере:', data);
+            return data;
+        } catch (error) {
+            console.error('❌ Ошибка создания профиля:', error);
+            return null;
+        }
+    }
+
+    // DELETE /profiles/:id — удалить профиль на сервере
+    async function deleteProfileOnServer(id) {
+        try {
+            const user = getCurrentUser();
+            if (!user) {
+                log('❌ Пользователь не авторизован');
+                return false;
+            }
+
+            console.log(`📤 DELETE ${API_URL}/profiles/${id}`);
+            const response = await fetch(`${API_URL}/profiles/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-User-Email': user.email
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка: ${response.status}`);
+            }
+
+            console.log(`✅ Профиль ${id} удалён на сервере`);
+            return true;
+        } catch (error) {
+            console.error('❌ Ошибка удаления профиля:', error);
+            return false;
+        }
+    }
+
+    // ================================================================
+    // 7. АВТОРИЗАЦИЯ
     // ================================================================
     function showAuthError(message) {
         const el = document.getElementById('authError');
@@ -1178,7 +1257,6 @@
         document.getElementById('authError').classList.remove('visible');
     }
 
-    // Переключение между входом и регистрацией
     document.getElementById('switchLink').addEventListener('click', function() {
         if (isAuthMode === 'login') {
             isAuthMode = 'register';
@@ -1199,7 +1277,6 @@
         }
     });
 
-    // Валидация авторизации
     function validateAuthForm(email, password) {
         let hasError = false;
         
@@ -1226,7 +1303,6 @@
         return !hasError;
     }
 
-    // Обработка авторизации
     document.getElementById('authForm').addEventListener('submit', function(e) {
         e.preventDefault();
         
@@ -1272,7 +1348,6 @@
                     showToast('Аккаунт успешно создан!', 'success');
                 }
                 
-                // СОХРАНЯЕМ СЕССИЮ
                 saveSession(currentUser);
                 
                 document.getElementById('authOverlay').classList.add('hidden');
@@ -1296,12 +1371,12 @@
     });
 
     // ================================================================
-    // 7. ВЫХОД
+    // 8. ВЫХОД
     // ================================================================
     document.getElementById('logoutBtn').addEventListener('click', function() {
         if (confirm('Вы уверены, что хотите выйти?')) {
             currentUser = null;
-            clearSession(); // Очищаем сессию
+            clearSession();
             document.getElementById('appContent').style.display = 'none';
             document.getElementById('authOverlay').classList.remove('hidden');
             document.getElementById('authForm').reset();
@@ -1312,7 +1387,7 @@
     });
 
     // ================================================================
-    // 8. ОБНОВЛЕНИЕ UI
+    // 9. ОБНОВЛЕНИЕ UI
     // ================================================================
     function updateUserUI() {
         if (!currentUser) return;
@@ -1329,7 +1404,7 @@
     }
 
     // ================================================================
-    // 9. НАВИГАЦИЯ
+    // 10. НАВИГАЦИЯ
     // ================================================================
     document.querySelectorAll('.nav-links button').forEach(btn => {
         btn.addEventListener('click', function() {
@@ -1342,11 +1417,13 @@
     });
 
     // ================================================================
-    // 10. ОБЗОР
+    // 11. ОБЗОР
     // ================================================================
-    function loadDashboard() {
+    async function loadDashboard() {
         if (!currentUser) return;
-        const profiles = loadProfiles(currentUser.email);
+        
+        // Загружаем с сервера
+        const profiles = await fetchProfiles();
         const count = profiles.length;
         
         document.getElementById('statUsers').textContent = count;
@@ -1375,14 +1452,16 @@
     document.getElementById('refreshDashboard').addEventListener('click', loadDashboard);
 
     // ================================================================
-    // 11. МОИ ПРОФИЛИ
+    // 12. МОИ ПРОФИЛИ (ЗАГРУЗКА С СЕРВЕРА)
     // ================================================================
-    function loadMyProfiles() {
+    async function loadMyProfiles() {
         if (!currentUser) return;
-        myProfiles = loadProfiles(currentUser.email);
+        
+        // ✅ Загружаем с сервера
+        const profiles = await fetchProfiles();
+        myProfiles = profiles;
         renderProfilesTable();
         document.getElementById('userCount').textContent = myProfiles.length;
-        return myProfiles;
     }
 
     function renderProfilesTable() {
@@ -1439,30 +1518,39 @@
         `;
         
         container.innerHTML = html;
-        setResult('usersResult', `✅ Загружено ${myProfiles.length} профилей`, 'success');
+        setResult('usersResult', `✅ Загружено ${myProfiles.length} профилей с сервера`, 'success');
     }
 
     document.getElementById('loadUsersBtn').addEventListener('click', function() {
         loadMyProfiles();
-        showToast(`Загружено ${myProfiles.length} профилей`, 'success');
+        showToast(`Загружено ${myProfiles.length} профилей с сервера`, 'success');
     });
 
-    document.getElementById('clearUsersBtn').addEventListener('click', function() {
+    // ================================================================
+    // 13. ОЧИСТКА (УДАЛЕНИЕ ВСЕХ ПРОФИЛЕЙ)
+    // ================================================================
+    document.getElementById('clearUsersBtn').addEventListener('click', async function() {
         if (!confirm('Вы уверены, что хотите удалить все профили?')) return;
+        
+        let deletedCount = 0;
+        for (const profile of myProfiles) {
+            const success = await deleteProfileOnServer(profile.id);
+            if (success) deletedCount++;
+        }
+        
         myProfiles = [];
-        saveProfiles(currentUser.email, []);
         renderProfilesTable();
         document.getElementById('userCount').textContent = '0';
-        setResult('usersResult', 'Данные очищены', '');
-        showToast('Все профили удалены');
-        log('Профили очищены');
+        setResult('usersResult', `✅ Удалено ${deletedCount} профилей с сервера`, 'success');
+        showToast(`Удалено ${deletedCount} профилей`, '');
+        log('Профили очищены на сервере');
         loadDashboard();
     });
 
     // ================================================================
-    // 12. СОЗДАНИЕ ПРОФИЛЯ
+    // 14. СОЗДАНИЕ ПРОФИЛЯ (НА СЕРВЕРЕ)
     // ================================================================
-    document.getElementById('createUserForm').addEventListener('submit', function(e) {
+    document.getElementById('createUserForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const name = document.getElementById('createName').value.trim();
@@ -1500,31 +1588,32 @@
             name: name,
             email: email,
             phone: phone || '—',
-            website: website || '—',
-            createdBy: currentUser.email,
-            createdAt: new Date().toISOString()
+            website: website || '—'
         };
 
-        const profiles = loadProfiles(currentUser.email);
-        newProfile.id = Date.now() + Math.floor(Math.random() * 1000);
-        profiles.push(newProfile);
-        saveProfiles(currentUser.email, profiles);
-        myProfiles = profiles;
-
-        setResult('createResult', 
-            `✅ Профиль создан!\nИмя: ${name}\nEmail: ${email}\nID: ${newProfile.id}`,
-            'success'
-        );
-        showToast(`Профиль "${name}" создан`, 'success');
-        log(`Создан профиль: ${name}`);
+        // ✅ Отправляем на сервер
+        const result = await createProfileOnServer(newProfile);
         
-        loadMyProfiles();
-        loadDashboard();
-        document.getElementById('createUserForm').reset();
+        if (result) {
+            setResult('createResult', 
+                `✅ Профиль создан на сервере!\nИмя: ${name}\nEmail: ${email}\nID: ${result.id}`,
+                'success'
+            );
+            showToast(`Профиль "${name}" создан на сервере`, 'success');
+            log(`Создан профиль на сервере: ${name}`);
+            
+            // Обновляем список
+            loadMyProfiles();
+            loadDashboard();
+            document.getElementById('createUserForm').reset();
+        } else {
+            setResult('createResult', '❌ Ошибка создания профиля на сервере', 'error');
+            showToast('Ошибка создания профиля', 'error');
+        }
     });
 
     // ================================================================
-    // 13. РЕДАКТИРОВАНИЕ ПРОФИЛЯ (модальное окно)
+    // 15. РЕДАКТИРОВАНИЕ ПРОФИЛЯ (модальное окно)
     // ================================================================
     window.openEditModal = function(id) {
         const profile = myProfiles.find(p => p.id === id);
@@ -1551,7 +1640,10 @@
         }
     });
 
-    document.getElementById('editForm').addEventListener('submit', function(e) {
+    // ================================================================
+    // 16. ОБНОВЛЕНИЕ ПРОФИЛЯ НА СЕРВЕРЕ (PUT)
+    // ================================================================
+    document.getElementById('editForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         
         const id = parseInt(document.getElementById('editId').value);
@@ -1585,50 +1677,65 @@
             return;
         }
 
-        const profiles = loadProfiles(currentUser.email);
-        const index = profiles.findIndex(p => p.id === id);
-        if (index !== -1) {
-            profiles[index].name = name;
-            profiles[index].email = email;
-            profiles[index].phone = phone || '—';
-            profiles[index].website = website || '—';
-            saveProfiles(currentUser.email, profiles);
-            myProfiles = profiles;
+        try {
+            const user = getCurrentUser();
+            const updateData = { name, email, phone, website };
             
-            setResult('editResult', '✅ Профиль обновлён!', 'success');
+            console.log(`📤 PUT ${API_URL}/profiles/${id}`, updateData);
+            const response = await fetch(`${API_URL}/profiles/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-User-Email': user.email
+                },
+                body: JSON.stringify(updateData)
+            });
+
+            if (!response.ok) {
+                throw new Error(`Ошибка: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log('✅ Профиль обновлён на сервере:', data);
+            
+            setResult('editResult', '✅ Профиль обновлён на сервере!', 'success');
             showToast('Профиль обновлён', 'success');
-            log(`Обновлён профиль ID ${id}`);
+            log(`Обновлён профиль ID ${id} на сервере`);
             
-            renderProfilesTable();
-            loadDashboard();
+            // Обновляем список
+            await loadMyProfiles();
+            await loadDashboard();
             
             setTimeout(() => {
                 document.getElementById('editModal').classList.remove('visible');
             }, 800);
+        } catch (error) {
+            console.error('❌ Ошибка обновления профиля:', error);
+            setResult('editResult', '❌ Ошибка обновления профиля', 'error');
         }
     });
 
     // ================================================================
-    // 14. УДАЛЕНИЕ ПРОФИЛЯ
+    // 17. УДАЛЕНИЕ ПРОФИЛЯ (НА СЕРВЕРЕ)
     // ================================================================
-    window.deleteProfile = function(id) {
+    window.deleteProfile = async function(id) {
         if (!confirm('Вы уверены, что хотите удалить этот профиль?')) return;
         
-        const profiles = loadProfiles(currentUser.email);
-        const newProfiles = profiles.filter(p => p.id !== id);
-        saveProfiles(currentUser.email, newProfiles);
-        myProfiles = newProfiles;
-        
-        renderProfilesTable();
-        loadDashboard();
-        document.getElementById('userCount').textContent = myProfiles.length;
-        
-        showToast('Профиль удалён', '');
-        log(`Удалён профиль ID ${id}`);
+        const success = await deleteProfileOnServer(id);
+        if (success) {
+            myProfiles = myProfiles.filter(p => p.id !== id);
+            renderProfilesTable();
+            loadDashboard();
+            document.getElementById('userCount').textContent = myProfiles.length;
+            showToast('Профиль удалён с сервера', '');
+            log(`Удалён профиль ID ${id} с сервера`);
+        } else {
+            showToast('Ошибка удаления профиля', 'error');
+        }
     };
 
     // ================================================================
-    // 15. РЕДАКТИРОВАНИЕ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ
+    // 18. РЕДАКТИРОВАНИЕ ПРОФИЛЯ ПОЛЬЗОВАТЕЛЯ
     // ================================================================
     document.getElementById('profileForm').addEventListener('submit', function(e) {
         e.preventDefault();
@@ -1640,7 +1747,6 @@
         
         let hasError = false;
         
-        // Валидация имени
         if (!name) {
             document.getElementById('profileNameError').classList.add('visible');
             document.getElementById('profileEditName').classList.add('error');
@@ -1651,7 +1757,6 @@
             document.getElementById('profileEditName').classList.add('success');
         }
         
-        // Валидация email
         if (!validateEmail(email)) {
             document.getElementById('profileEmailError').classList.add('visible');
             document.getElementById('profileEditEmail').classList.add('error');
@@ -1662,7 +1767,6 @@
             document.getElementById('profileEditEmail').classList.add('success');
         }
         
-        // Проверка, что email не занят другим пользователем
         if (email !== currentUser.email) {
             const users = loadUsers();
             const existing = users.find(u => u.email === email);
@@ -1676,7 +1780,6 @@
             }
         }
         
-        // Валидация пароля (если заполнен)
         if (newPassword || confirmPassword) {
             if (!validatePassword(newPassword)) {
                 document.getElementById('profilePasswordError').classList.add('visible');
@@ -1698,7 +1801,6 @@
                 document.getElementById('profileConfirmPassword').classList.add('success');
             }
         } else {
-            // Поля пустые — убираем ошибки
             document.getElementById('profilePasswordError').classList.remove('visible');
             document.getElementById('profileNewPassword').classList.remove('error');
             document.getElementById('profileConfirmError').classList.remove('visible');
@@ -1711,7 +1813,6 @@
             return;
         }
         
-        // Обновляем пользователя
         const users = loadUsers();
         const userIndex = users.findIndex(u => u.email === currentUser.email);
         
@@ -1723,19 +1824,10 @@
             }
             saveUsers(users);
             
-            // Обновляем текущего пользователя
             const oldEmail = currentUser.email;
             currentUser.name = name;
             currentUser.email = email;
             
-            // Если email изменился, переносим профили
-            if (oldEmail !== email) {
-                const profiles = loadProfiles(oldEmail);
-                saveProfiles(email, profiles);
-                localStorage.removeItem(getProfilesKey(oldEmail));
-            }
-            
-            // СОХРАНЯЕМ ОБНОВЛЁННУЮ СЕССИЮ
             saveSession(currentUser);
             
             updateUserUI();
@@ -1749,7 +1841,6 @@
             showToast('Профиль обновлён!', 'success');
             log(`Профиль обновлён: ${name}, ${email}`);
             
-            // Очищаем поля пароля
             document.getElementById('profileNewPassword').value = '';
             document.getElementById('profileConfirmPassword').value = '';
             document.getElementById('profileNewPassword').classList.remove('success');
@@ -1758,12 +1849,11 @@
     });
 
     // ================================================================
-    // 16. ВОССТАНОВЛЕНИЕ СЕССИИ ПРИ ЗАГРУЗКЕ (НОВОЕ!)
+    // 19. ВОССТАНОВЛЕНИЕ СЕССИИ
     // ================================================================
     function restoreSession() {
         const session = loadSession();
         if (session) {
-            // Проверяем, что пользователь всё ещё существует
             const user = findUser(session.email);
             if (user) {
                 currentUser = { email: user.email, name: user.name };
@@ -1779,7 +1869,6 @@
                 showToast(`С возвращением, ${currentUser.name}!`, 'success');
                 return true;
             } else {
-                // Пользователь был удалён — очищаем сессию
                 clearSession();
                 log('Сессия недействительна — очищена');
             }
@@ -1788,9 +1877,28 @@
     }
 
     // ================================================================
-    // 17. ЗАПУСК
+    // 20. ТЕСТОВЫЙ ЗАПРОС В NETWORK
     // ================================================================
-    // Проверяем, есть ли пользователи в системе
+    function testNetworkRequest() {
+        log('📤 Отправляем тестовый запрос к API...');
+        
+        fetch('https://jsonplaceholder.typicode.com/users/1')
+            .then(response => {
+                log(`📥 Ответ получен! Статус: ${response.status}`);
+                return response.json();
+            })
+            .then(data => {
+                log(`✅ Данные загружены: ${data.name} (${data.email})`);
+                console.log('📦 Данные от API:', data);
+            })
+            .catch(error => {
+                log(`❌ Ошибка запроса: ${error.message}`);
+            });
+    }
+
+    // ================================================================
+    // 21. ЗАПУСК
+    // ================================================================
     const users = loadUsers();
     if (users.length === 0) {
         const testUser = {
@@ -1803,32 +1911,16 @@
         log('Создан тестовый пользователь: user@example.com / password123');
     }
 
-    // ПЫТАЕМСЯ ВОССТАНОВИТЬ СЕССИЮ
     const sessionRestored = restoreSession();
 
     if (!sessionRestored) {
-        // Если сессия не восстановлена — показываем экран авторизации
         document.getElementById('authOverlay').classList.remove('hidden');
         document.getElementById('appContent').style.display = 'none';
         log('Сессия не найдена — требуется вход');
     }
 
     log('🚀 TaskFlow загружен');
-        // ===== ТЕСТОВЫЙ ЗАПРОС ДЛЯ NETWORK =====
-    log('📤 Отправляем тестовый запрос к API...');
-    
-    fetch('https://jsonplaceholder.typicode.com/users/1')
-        .then(response => {
-            log(`📥 Ответ получен! Статус: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            log(`✅ Данные загружены: ${data.name} (${data.email})`);
-            console.log('📦 Данные от API:', data);
-        })
-        .catch(error => {
-            log(`❌ Ошибка запроса: ${error.message}`);
-        });
+    testNetworkRequest();
     log(`📊 Пользователей в системе: ${loadUsers().length}`);
     log('💡 Для входа: user@example.com / password123');
     log('📝 Пароль должен быть от 6 до 50 символов');
