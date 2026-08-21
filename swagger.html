@@ -1,0 +1,1423 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 TaskFlow — Swagger API Документация</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #fafafa;
+        }
+        
+        /* ===== ШАПКА ===== */
+        .topbar {
+            background: #1a1a2e;
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #4f46e5;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .topbar .left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .topbar .logo {
+            font-size: 22px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .topbar .logo span {
+            color: #4f46e5;
+        }
+        
+        .topbar .version {
+            background: #4f46e5;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .topbar .badge {
+            background: #10b981;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .topbar .badge.lock {
+            background: #f59e0b;
+        }
+        
+        .topbar .right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .topbar .right a,
+        .topbar .right button {
+            color: #94a3b8;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.2s;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: transparent;
+            cursor: pointer;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .topbar .right a:hover,
+        .topbar .right button:hover {
+            color: white;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .topbar .right .btn-download {
+            color: #4f46e5;
+            background: white;
+            border-color: #4f46e5;
+            font-weight: 500;
+        }
+        
+        .topbar .right .btn-download:hover {
+            background: #4f46e5;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        
+        .topbar .right .btn-download svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .topbar .right .btn-primary {
+            color: #4f46e5;
+            background: white;
+            border-color: #4f46e5;
+        }
+        
+        .topbar .right .btn-primary:hover {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        .topbar .user-status {
+            color: #94a3b8;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .topbar .user-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        
+        .topbar .user-status .dot.online {
+            background: #10b981;
+        }
+        
+        .topbar .user-status .dot.offline {
+            background: #ef4444;
+        }
+        
+        /* ===== КОНТЕЙНЕР SWAGGER ===== */
+        #swagger-ui {
+            padding: 0 20px;
+        }
+        
+        /* ===== СТАТУС-БАР ===== */
+        .status-bar {
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 32px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            font-size: 13px;
+            color: #64748b;
+            flex-wrap: wrap;
+        }
+        
+        .status-bar .item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .status-bar .item strong {
+            color: #1a1a2e;
+        }
+        
+        .status-bar .item .count {
+            background: #e2e8f0;
+            padding: 0 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+        
+        /* ===== ТОСТ ===== */
+        .custom-toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+            z-index: 9999;
+            animation: slideUp 0.3s ease;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .custom-toast.success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .custom-toast.error {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .custom-toast.info {
+            background: #4f46e5;
+            color: white;
+        }
+        
+        @keyframes slideUp {
+            from {
+                transform: translateY(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 768px) {
+            .topbar {
+                padding: 12px 16px;
+            }
+            .topbar .logo {
+                font-size: 18px;
+            }
+            .topbar .right a,
+            .topbar .right button {
+                font-size: 12px;
+                padding: 4px 10px;
+            }
+            .status-bar {
+                padding: 8px 16px;
+                font-size: 12px;
+                gap: 12px;
+            }
+            #swagger-ui {
+                padding: 0 10px;
+            }
+            .custom-toast {
+                bottom: 16px;
+                right: 16px;
+                left: 16px;
+                max-width: none;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .topbar .left {
+                gap: 10px;
+            }
+            .topbar .badge {
+                font-size: 10px;
+                padding: 2px 10px;
+            }
+            .topbar .right {
+                gap: 6px;
+            }
+            .topbar .right a,
+            .topbar .right button {
+                font-size: 11px;
+                padding: 4px 8px;
+            }
+        }
+        
+        /* ===== КАСТОМНЫЕ СТИЛИ ДЛЯ SWAGGER ===== */
+        .swagger-ui .info .title {
+            color: #1a1a2e !important;
+        }
+        
+        .swagger-ui .info .title small {
+            background: #4f46e5 !important;
+        }
+        
+        .swagger-ui .scheme-container {
+            background: #f8fafc !important;
+            border-radius: 8px !important;
+            padding: 16px !important;
+        }
+        
+        .swagger-ui .btn.authorize {
+            border-color: #4f46e5 !important;
+            color: #4f46e5 !important;
+        }
+        
+        .swagger-ui .btn.authorize:hover {
+            background: #4f46e5 !important;
+            color: white !important;
+        }
+        
+        .swagger-ui .opblock-tag {
+            color: #1a1a2e !important;
+            font-weight: 600 !important;
+        }
+        
+        .swagger-ui .opblock-summary-method {
+            font-weight: 600 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ШАПКА ===== -->
+    <div class="topbar">
+        <div class="left">
+            <div class="logo">📋 Task<span>Flow</span></div>
+            <span class="version">API v1.0</span>
+            <span class="badge">✅ Live</span>
+            <span class="badge lock">🔒 Auth Required</span>
+        </div>
+        <div class="right">
+            <div class="user-status" id="userStatus">
+                <span class="dot offline" id="statusDot"></span>
+                <span id="statusText">Не авторизован</span>
+            </div>
+            
+            <!-- ===== НОВАЯ КНОПКА СКАЧИВАНИЯ ===== -->
+            <button class="btn-download" id="downloadBtn" title="Скачать OpenAPI спецификацию">
+                <svg viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Скачать swagger.json
+            </button>
+            
+            <a href="index.html" target="_blank">🚀 Приложение</a>
+            <button class="btn-primary" id="refreshBtn">🔄 Обновить</button>
+        </div>
+    </div>
+
+    <!-- ===== СТАТУС-БАР ===== -->
+    <div class="status-bar">
+        <div class="item">
+            📊 <strong>Всего эндпоинтов:</strong> 
+            <span class="count" id="totalEndpoints">0</span>
+        </div>
+        <div class="item">
+            📝 <strong>Методы:</strong>
+            GET <span class="count" id="getCount">0</span>
+            POST <span class="count" id="postCount">0</span>
+            PUT <span class="count" id="putCount">0</span>
+            DELETE <span class="count" id="deleteCount">0</span>
+        </div>
+        <div class="item" style="margin-left:auto;">
+            🏷️ <strong>Теги:</strong> 
+            <span id="tagList">auth, profiles, dashboard</span>
+        </div>
+    </div>
+
+    <!-- ===== SWAGGER UI ===== -->
+    <div id="swagger-ui"></div>
+
+    <!-- ================================================================ -->
+    <!-- SCRIPTS -->
+    <!-- ================================================================ -->
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js">
+    </script>
+    
+    <script>
+        // ================================================================
+        // 1. ГЕНЕРАЦИЯ OPENAPI СПЕЦИФИКАЦИИ
+        // ================================================================
+        function generateOpenAPISpec() {
+            return {
+                openapi: "3.0.0",
+                info: {
+                    title: "TaskFlow API",
+                    description: `
+                        <h3>📋 Управление пользователями и профилями</h3>
+                        <p>Документация API для тестового стенда TaskFlow.</p>
+                        <p><strong>🔑 Тестовые данные:</strong></p>
+                        <ul>
+                            <li><strong>Email:</strong> user@example.com</li>
+                            <li><strong>Пароль:</strong> password123</li>
+                        </ul>
+                        <p><strong>📌 Особенности:</strong></p>
+                        <ul>
+                            <li>Все данные хранятся в <code>localStorage</code></li>
+                            <li>Каждый пользователь видит только свои профили</li>
+                            <li>Валидация полей: email и пароль 6-50 символов</li>
+                        </ul>
+                    `,
+                    version: "1.0.0",
+                    contact: {
+                        name: "TaskFlow Support",
+                        email: "support@taskflow.com"
+                    },
+                    license: {
+                        name: "MIT",
+                        url: "https://opensource.org/licenses/MIT"
+                    }
+                },
+                servers: [
+                    {
+                        url: window.location.origin + window.location.pathname.replace('swagger.html', ''),
+                        description: "Текущий сервер (ваш локальный стенд)"
+                    },
+                    {
+                        url: "http://localhost:5500",
+                        description: "Live Server (порт 5500)"
+                    },
+                    {
+                        url: "https://jsonplaceholder.typicode.com",
+                        description: "Тестовый API JSONPlaceholder"
+                    }
+                ],
+                tags: [{
+                        name: "auth",
+                        description: "🔐 Авторизация и управление пользователями"
+                    },
+                    {
+                        name: "profiles",
+                        description: "👥 Управление профилями пользователей"
+                    },
+                    {
+                        name: "dashboard",
+                        description: "📊 Статистика и обзор"
+                    },
+                    {
+                        name: "session",
+                        description: "💾 Управление сессией"
+                    }
+                ],
+                components: {
+                    securitySchemes: {
+                        sessionAuth: {
+                            type: "apiKey",
+                            in: "header",
+                            name: "X-User-Email",
+                            description: "Email пользователя для идентификации (берётся из localStorage)"
+                        }
+                    },
+                    schemas: {
+                        User: {
+                            type: "object",
+                            properties: {
+                                email: {
+                                    type: "string",
+                                    format: "email",
+                                    example: "user@example.com",
+                                    description: "Email пользователя (6-50 символов)",
+                                    minLength: 6,
+                                    maxLength: 50
+                                },
+                                name: {
+                                    type: "string",
+                                    example: "Иван Иванов",
+                                    description: "Имя пользователя"
+                                },
+                                password: {
+                                    type: "string",
+                                    format: "password",
+                                    example: "password123",
+                                    description: "Пароль (6-50 символов)",
+                                    minLength: 6,
+                                    maxLength: 50
+                                }
+                            },
+                            required: ["email", "password"]
+                        },
+                        Profile: {
+                            type: "object",
+                            properties: {
+                                id: {
+                                    type: "integer",
+                                    example: 1,
+                                    description: "Уникальный идентификатор профиля"
+                                },
+                                name: {
+                                    type: "string",
+                                    example: "Иван Иванов",
+                                    description: "Имя в профиле"
+                                },
+                                email: {
+                                    type: "string",
+                                    format: "email",
+                                    example: "ivan@example.com",
+                                    description: "Email в профиле (6-50 символов)",
+                                    minLength: 6,
+                                    maxLength: 50
+                                },
+                                phone: {
+                                    type: "string",
+                                    example: "+7 999 123-45-67",
+                                    description: "Телефон"
+                                },
+                                website: {
+                                    type: "string",
+                                    example: "example.com",
+                                    description: "Сайт"
+                                },
+                                createdBy: {
+                                    type: "string",
+                                    example: "user@example.com",
+                                    description: "Кто создал профиль"
+                                },
+                                createdAt: {
+                                    type: "string",
+                                    format: "date-time",
+                                    example: "2024-01-15T10:30:00.000Z",
+                                    description: "Дата создания"
+                                }
+                            },
+                            required: ["name", "email"]
+                        },
+                        Error: {
+                            type: "object",
+                            properties: {
+                                status: {
+                                    type: "integer",
+                                    example: 400
+                                },
+                                message: {
+                                    type: "string",
+                                    example: "Validation error"
+                                }
+                            }
+                        },
+                        DashboardStats: {
+                            type: "object",
+                            properties: {
+                                totalProfiles: {
+                                    type: "integer",
+                                    example: 5
+                                },
+                                totalUsers: {
+                                    type: "integer",
+                                    example: 3
+                                },
+                                lastProfiles: {
+                                    type: "array",
+                                    items: {
+                                        $ref: "#/components/schemas/Profile"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                paths: {
+                    "/users": {
+                        get: {
+                            tags: ["auth"],
+                            summary: "📋 Получить всех пользователей",
+                            description: "Возвращает список всех зарегистрированных пользователей в системе",
+                            responses: {
+                                "200": {
+                                    description: "Успешный ответ",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                type: "array",
+                                                items: {
+                                                    $ref: "#/components/schemas/User"
+                                                }
+                                            },
+                                            example: [{
+                                                    "email": "user@example.com",
+                                                    "name": "Тестовый Пользователь"
+                                                },
+                                                {
+                                                    "email": "admin@example.com",
+                                                    "name": "Администратор"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "500": {
+                                    description: "Внутренняя ошибка сервера"
+                                }
+                            }
+                        },
+                        post: {
+                            tags: ["auth"],
+                            summary: "📝 Регистрация пользователя",
+                            description: "Создаёт нового пользователя в системе. Email и пароль должны быть от 6 до 50 символов.",
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        schema: {
+                                            $ref: "#/components/schemas/User"
+                                        },
+                                        examples: {
+                                            "Успешная регистрация": {
+                                                value: {
+                                                    "email": "newuser@example.com",
+                                                    "name": "Новый Пользователь",
+                                                    "password": "password123"
+                                                }
+                                            },
+                                            "Минимальные данные": {
+                                                value: {
+                                                    "email": "test@mail.ru",
+                                                    "password": "123456"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "201": {
+                                    description: "✅ Пользователь создан",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/User"
+                                            },
+                                            example: {
+                                                "email": "newuser@example.com",
+                                                "name": "Новый Пользователь"
+                                            }
+                                        }
+                                    }
+                                },
+                                "400": {
+                                    description: "❌ Ошибка валидации",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Error"
+                                            },
+                                            example: {
+                                                "status": 400,
+                                                "message": "Email должен содержать от 6 до 50 символов"
+                                            }
+                                        }
+                                    }
+                                },
+                                "409": {
+                                    description: "❌ Пользователь уже существует",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Error"
+                                            },
+                                            example: {
+                                                "status": 409,
+                                                "message": "Пользователь с таким email уже существует"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/users/login": {
+                        post: {
+                            tags: ["auth"],
+                            summary: "🔑 Вход в систему",
+                            description: "Аутентификация пользователя. При успешном входе сессия сохраняется в localStorage.",
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        schema: {
+                                            type: "object",
+                                            properties: {
+                                                email: {
+                                                    type: "string",
+                                                    format: "email",
+                                                    example: "user@example.com"
+                                                },
+                                                password: {
+                                                    type: "string",
+                                                    format: "password",
+                                                    example: "password123"
+                                                }
+                                            },
+                                            required: ["email", "password"]
+                                        },
+                                        example: {
+                                            "email": "user@example.com",
+                                            "password": "password123"
+                                        }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "200": {
+                                    description: "✅ Успешный вход",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                type: "object",
+                                                properties: {
+                                                    user: {
+                                                        $ref: "#/components/schemas/User"
+                                                    },
+                                                    session: {
+                                                        type: "string",
+                                                        example: "saved_in_localStorage"
+                                                    }
+                                                }
+                                            },
+                                            example: {
+                                                "user": {
+                                                    "email": "user@example.com",
+                                                    "name": "Тестовый Пользователь"
+                                                },
+                                                "session": "✅ Сессия сохранена в localStorage"
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": {
+                                    description: "❌ Неверный логин или пароль",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Error"
+                                            },
+                                            example: {
+                                                "status": 401,
+                                                "message": "Неверный пароль"
+                                            }
+                                        }
+                                    }
+                                },
+                                "404": {
+                                    description: "❌ Пользователь не найден",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Error"
+                                            },
+                                            example: {
+                                                "status": 404,
+                                                "message": "Пользователь не найден. Зарегистрируйтесь."
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/users/profile": {
+                        get: {
+                            tags: ["auth"],
+                            summary: "👤 Получить профиль текущего пользователя",
+                            description: "Возвращает данные текущего пользователя из сессии",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Данные пользователя",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/User"
+                                            },
+                                            example: {
+                                                "email": "user@example.com",
+                                                "name": "Тестовый Пользователь"
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        },
+                        put: {
+                            tags: ["auth"],
+                            summary: "✏️ Обновить профиль пользователя",
+                            description: "Обновляет данные текущего пользователя. Email должен быть уникальным в системе.",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        schema: {
+                                            type: "object",
+                                            properties: {
+                                                name: {
+                                                    type: "string",
+                                                    example: "Новое Имя"
+                                                },
+                                                email: {
+                                                    type: "string",
+                                                    format: "email",
+                                                    example: "newemail@example.com"
+                                                },
+                                                password: {
+                                                    type: "string",
+                                                    format: "password",
+                                                    example: "newpassword123",
+                                                    description: "Оставьте пустым, чтобы не менять"
+                                                }
+                                            }
+                                        },
+                                        example: {
+                                            "name": "Новое Имя",
+                                            "email": "newemail@example.com",
+                                            "password": "newpassword123"
+                                        }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "200": {
+                                    description: "✅ Профиль обновлён",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/User"
+                                            }
+                                        }
+                                    }
+                                },
+                                "400": {
+                                    description: "❌ Ошибка валидации",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Error"
+                                            }
+                                        }
+                                    }
+                                },
+                                "409": {
+                                    description: "❌ Email уже занят"
+                                }
+                            }
+                        }
+                    },
+                    "/users/logout": {
+                        post: {
+                            tags: ["auth", "session"],
+                            summary: "🚪 Выход из системы",
+                            description: "Очищает сессию пользователя и удаляет данные из localStorage",
+                            responses: {
+                                "200": {
+                                    description: "✅ Выход выполнен",
+                                    content: {
+                                        "application/json": {
+                                            example: {
+                                                "message": "Сессия очищена",
+                                                "status": "success"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "/session/check": {
+                        get: {
+                            tags: ["session"],
+                            summary: "🔍 Проверить активность сессии",
+                            description: "Проверяет, есть ли активная сессия в localStorage",
+                            responses: {
+                                "200": {
+                                    description: "✅ Сессия активна",
+                                    content: {
+                                        "application/json": {
+                                            example: {
+                                                "isActive": true,
+                                                "user": {
+                                                    "email": "user@example.com",
+                                                    "name": "Тестовый Пользователь"
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": {
+                                    description: "❌ Сессия не активна"
+                                }
+                            }
+                        }
+                    },
+                    "/profiles": {
+                        get: {
+                            tags: ["profiles"],
+                            summary: "📋 Получить все профили пользователя",
+                            description: "Возвращает список всех профилей, созданных текущим пользователем",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Список профилей",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                type: "array",
+                                                items: {
+                                                    $ref: "#/components/schemas/Profile"
+                                                }
+                                            },
+                                            example: [{
+                                                    "id": 1,
+                                                    "name": "Иван Иванов",
+                                                    "email": "ivan@example.com",
+                                                    "phone": "+7 999 123-45-67",
+                                                    "website": "example.com",
+                                                    "createdBy": "user@example.com",
+                                                    "createdAt": "2024-01-15T10:30:00Z"
+                                                },
+                                                {
+                                                    "id": 2,
+                                                    "name": "Петр Петров",
+                                                    "email": "petr@example.com",
+                                                    "phone": "+7 999 765-43-21",
+                                                    "website": "petr-site.com",
+                                                    "createdBy": "user@example.com",
+                                                    "createdAt": "2024-01-16T14:20:00Z"
+                                                }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        },
+                        post: {
+                            tags: ["profiles"],
+                            summary: "➕ Создать новый профиль",
+                            description: "Создаёт новый профиль для текущего пользователя. Email должен быть от 6 до 50 символов.",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        schema: {
+                                            type: "object",
+                                            properties: {
+                                                name: {
+                                                    type: "string",
+                                                    example: "Иван Иванов"
+                                                },
+                                                email: {
+                                                    type: "string",
+                                                    format: "email",
+                                                    example: "ivan@example.com"
+                                                },
+                                                phone: {
+                                                    type: "string",
+                                                    example: "+7 999 123-45-67"
+                                                },
+                                                website: {
+                                                    type: "string",
+                                                    example: "example.com"
+                                                }
+                                            },
+                                            required: ["name", "email"]
+                                        },
+                                        example: {
+                                            "name": "Иван Иванов",
+                                            "email": "ivan@example.com",
+                                            "phone": "+7 999 123-45-67",
+                                            "website": "example.com"
+                                        }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "201": {
+                                    description: "✅ Профиль создан",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Profile"
+                                            },
+                                            example: {
+                                                "id": 3,
+                                                "name": "Иван Иванов",
+                                                "email": "ivan@example.com",
+                                                "phone": "+7 999 123-45-67",
+                                                "website": "example.com",
+                                                "createdBy": "user@example.com",
+                                                "createdAt": "2024-01-15T10:30:00.000Z"
+                                            }
+                                        }
+                                    }
+                                },
+                                "400": {
+                                    description: "❌ Ошибка валидации",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Error"
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        }
+                    },
+                    "/profiles/{id}": {
+                        get: {
+                            tags: ["profiles"],
+                            summary: "🔍 Получить профиль по ID",
+                            description: "Возвращает конкретный профиль по его ID",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            parameters: [{
+                                in: "path",
+                                name: "id",
+                                schema: {
+                                    type: "integer"
+                                },
+                                required: true,
+                                description: "ID профиля",
+                                example: 1
+                            }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Профиль найден",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Profile"
+                                            },
+                                            example: {
+                                                "id": 1,
+                                                "name": "Иван Иванов",
+                                                "email": "ivan@example.com",
+                                                "phone": "+7 999 123-45-67",
+                                                "website": "example.com",
+                                                "createdBy": "user@example.com",
+                                                "createdAt": "2024-01-15T10:30:00Z"
+                                            }
+                                        }
+                                    }
+                                },
+                                "404": {
+                                    description: "❌ Профиль не найден"
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        },
+                        put: {
+                            tags: ["profiles"],
+                            summary: "✏️ Обновить профиль по ID",
+                            description: "Обновляет существующий профиль",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            parameters: [{
+                                in: "path",
+                                name: "id",
+                                schema: {
+                                    type: "integer"
+                                },
+                                required: true,
+                                description: "ID профиля",
+                                example: 1
+                            }],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        schema: {
+                                            $ref: "#/components/schemas/Profile"
+                                        },
+                                        example: {
+                                            "name": "Обновлённое Имя",
+                                            "email": "updated@example.com",
+                                            "phone": "+7 999 111-22-33",
+                                            "website": "updated-site.com"
+                                        }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "200": {
+                                    description: "✅ Профиль обновлён",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/Profile"
+                                            }
+                                        }
+                                    }
+                                },
+                                "404": {
+                                    description: "❌ Профиль не найден"
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        },
+                        delete: {
+                            tags: ["profiles"],
+                            summary: "🗑 Удалить профиль по ID",
+                            description: "Удаляет существующий профиль",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            parameters: [{
+                                in: "path",
+                                name: "id",
+                                schema: {
+                                    type: "integer"
+                                },
+                                required: true,
+                                description: "ID профиля",
+                                example: 1
+                            }],
+                            responses: {
+                                "204": {
+                                    description: "✅ Профиль удалён"
+                                },
+                                "404": {
+                                    description: "❌ Профиль не найден"
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        }
+                    },
+                    "/dashboard": {
+                        get: {
+                            tags: ["dashboard"],
+                            summary: "📊 Получить статистику",
+                            description: "Возвращает общую статистику по профилям пользователя",
+                            security: [{
+                                sessionAuth: []
+                            }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Статистика",
+                                    content: {
+                                        "application/json": {
+                                            schema: {
+                                                $ref: "#/components/schemas/DashboardStats"
+                                            },
+                                            example: {
+                                                "totalProfiles": 5,
+                                                "totalUsers": 3,
+                                                "lastProfiles": [{
+                                                        "id": 1,
+                                                        "name": "Иван Иванов",
+                                                        "email": "ivan@example.com"
+                                                    },
+                                                    {
+                                                        "id": 2,
+                                                        "name": "Петр Петров",
+                                                        "email": "petr@example.com"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    }
+                                },
+                                "401": {
+                                    description: "❌ Не авторизован"
+                                }
+                            }
+                        }
+                    },
+                    "/health": {
+                        get: {
+                            tags: ["dashboard"],
+                            summary: "❤️ Проверка здоровья API",
+                            description: "Проверяет доступность API и состояние localStorage",
+                            responses: {
+                                "200": {
+                                    description: "✅ API работает",
+                                    content: {
+                                        "application/json": {
+                                            example: {
+                                                "status": "ok",
+                                                "timestamp": "2024-01-15T10:30:00Z",
+                                                "users": 2,
+                                                "storage": "available"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        // ================================================================
+        // 2. ФУНКЦИЯ СКАЧИВАНИЯ (НОВАЯ!)
+        // ================================================================
+        function downloadSwaggerSpec() {
+            try {
+                const spec = generateOpenAPISpec();
+                const jsonString = JSON.stringify(spec, null, 2);
+                const blob = new Blob([jsonString], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                // Создаём ссылку для скачивания
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'swagger.json';
+                document.body.appendChild(link);
+                link.click();
+                
+                // Очищаем
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                showToast('✅ Файл swagger.json скачан!', 'success');
+                console.log('📥 Swagger спецификация скачана');
+            } catch (error) {
+                console.error('Ошибка скачивания:', error);
+                showToast('❌ Ошибка при скачивании: ' + error.message, 'error');
+            }
+        }
+
+        // ================================================================
+        // 3. ПОЛУЧЕНИЕ ДАННЫХ ИЗ localStorage
+        // ================================================================
+        function getCurrentUser() {
+            try {
+                const session = localStorage.getItem('taskflow_session');
+                return session ? JSON.parse(session) : null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function updateUserStatus() {
+            const user = getCurrentUser();
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+
+            if (user) {
+                dot.className = 'dot online';
+                text.textContent = `✅ ${user.name || user.email}`;
+                text.style.color = '#10b981';
+            } else {
+                dot.className = 'dot offline';
+                text.textContent = '🔒 Не авторизован';
+                text.style.color = '#94a3b8';
+            }
+        }
+
+        // ================================================================
+        // 4. ПОДСЧЁТ СТАТИСТИКИ
+        // ================================================================
+        function updateStats(spec) {
+            const paths = spec.paths;
+            let total = 0;
+            let get = 0,
+                post = 0,
+                put = 0,
+                del = 0;
+
+            Object.values(paths).forEach(path => {
+                Object.keys(path).forEach(method => {
+                    total++;
+                    if (method === 'get') get++;
+                    if (method === 'post') post++;
+                    if (method === 'put') put++;
+                    if (method === 'delete') del++;
+                });
+            });
+
+            document.getElementById('totalEndpoints').textContent = total;
+            document.getElementById('getCount').textContent = get;
+            document.getElementById('postCount').textContent = post;
+            document.getElementById('putCount').textContent = put;
+            document.getElementById('deleteCount').textContent = del;
+
+            const tags = spec.tags.map(t => t.name).join(', ');
+            document.getElementById('tagList').textContent = tags;
+        }
+
+        // ================================================================
+        // 5. ИНИЦИАЛИЗАЦИЯ SWAGGER UI
+        // ================================================================
+        function initSwagger() {
+            const spec = generateOpenAPISpec();
+
+            updateUserStatus();
+            updateStats(spec);
+
+            const ui = SwaggerUIBundle({
+                spec: spec,
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout",
+                requestInterceptor: function(request) {
+                    const user = getCurrentUser();
+                    if (user) {
+                        request.headers['X-User-Email'] = user.email;
+                    }
+                    return request;
+                },
+                authorizations: {
+                    sessionAuth: {
+                        type: 'apiKey',
+                        in: 'header',
+                        name: 'X-User-Email',
+                        value: getCurrentUser()?.email || ''
+                    }
+                }
+            });
+
+            window.ui = ui;
+            console.log('📚 Swagger UI инициализирован');
+            console.log(`📊 Всего эндпоинтов: ${document.getElementById('totalEndpoints').textContent}`);
+            console.log(`👤 Текущий пользователь:`, getCurrentUser());
+        }
+
+        // ================================================================
+        // 6. TOAST-УВЕДОМЛЕНИЯ
+        // ================================================================
+        function showToast(message, type = 'info') {
+            const existing = document.querySelector('.custom-toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `custom-toast ${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // ================================================================
+        // 7. ОБНОВЛЕНИЕ
+        // ================================================================
+        document.getElementById('refreshBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.getElementById('swagger-ui').innerHTML = '';
+            initSwagger();
+            showToast('🔄 Swagger обновлён', 'success');
+        });
+
+        // ================================================================
+        // 8. КНОПКА СКАЧИВАНИЯ (НОВАЯ!)
+        // ================================================================
+        document.getElementById('downloadBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            downloadSwaggerSpec();
+        });
+
+        // ================================================================
+        // 9. АВТООБНОВЛЕНИЕ СТАТУСА
+        // ================================================================
+        setInterval(() => {
+            const oldStatus = document.getElementById('statusText').textContent;
+            const user = getCurrentUser();
+            const newStatus = user ? `✅ ${user.name || user.email}` : '🔒 Не авторизован';
+
+            if (oldStatus !== newStatus) {
+                updateUserStatus();
+            }
+        }, 2000);
+
+        // ================================================================
+        // 10. ЗАПУСК
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initSwagger();
+            
+            // Добавляем горячие клавиши
+            document.addEventListener('keydown', function(e) {
+                // Ctrl+Shift+D или Cmd+Shift+D для скачивания
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'D') {
+                    e.preventDefault();
+                    downloadSwaggerSpec();
+                }
+            });
+        });
+
+        console.log('📚 TaskFlow Swagger UI загружен');
+        console.log('💡 Перейдите на index.html для работы с приложением');
+        console.log('🔑 Тестовый пользователь: user@example.com / password123');
+        console.log('📥 Нажмите кнопку "Скачать swagger.json" или используйте Ctrl+Shift+D');
+    </script>
+
+</body>
+</html>

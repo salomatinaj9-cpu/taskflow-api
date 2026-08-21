@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📚 Мой Swagger — Документация API</title>
+    <style>
+        /* ===== ГЛОБАЛЬНЫЕ СТИЛИ ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+        }
+
+        /* ===== ШАПКА ===== */
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%);
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 3px solid #4f46e5;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header .logo h1 {
+            color: white;
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .header .logo h1 span {
+            color: #4f46e5;
+        }
+
+        .header .logo .version {
+            background: #4f46e5;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .header .badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .header .badges .badge {
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .badge.green {
+            background: #10b981;
+        }
+        .badge.yellow {
+            background: #f59e0b;
+        }
+        .badge.blue {
+            background: #3b82f6;
+        }
+
+        .header .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .header .actions .user-status {
+            color: #94a3b8;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header .actions .user-status .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .dot.online {
+            background: #10b981;
+        }
+        .dot.offline {
+            background: #ef4444;
+        }
+
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: inherit;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-white {
+            background: white;
+            color: #1a1a2e;
+        }
+        .btn-white:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: #4f46e5;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid #4f46e5;
+        }
+        .btn-outline:hover {
+            background: #4f46e5;
+            transform: translateY(-2px);
+        }
+
+        /* ===== СТАТУС-БАР ===== */
+        .status-bar {
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 10px 32px;
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: #64748b;
+            flex-wrap: wrap;
+        }
+
+        .status-bar .item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-bar .item strong {
+            color: #1a1a2e;
+        }
+
+        .status-bar .item .count {
+            background: #e2e8f0;
+            padding: 0 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        /* ===== КОНТЕЙНЕР ===== */
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        /* ===== ИНФО-БЛОК ===== */
+        .info-block {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8ecf1;
+        }
+
+        .info-block h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .info-block .description {
+            color: #64748b;
+            line-height: 1.8;
+            margin-bottom: 12px;
+        }
+
+        .info-block .description code {
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .info-block .servers {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+
+        .info-block .servers .server {
+            background: #f8fafc;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+            font-family: monospace;
+        }
+
+        /* ===== ТАГИ ===== */
+        .tag {
+            margin-bottom: 24px;
+        }
+
+        .tag-header {
+            background: white;
+            border-radius: 12px 12px 0 0;
+            padding: 16px 24px;
+            border: 1px solid #e8ecf1;
+            border-bottom: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .tag-header h3 {
+            font-size: 20px;
+        }
+
+        .tag-header .tag-badge {
+            background: #eef2ff;
+            color: #4f46e5;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ===== ЭНДПОИНТ ===== */
+        .endpoint {
+            background: white;
+            border-radius: 0 0 12px 12px;
+            margin-bottom: 4px;
+            border: 1px solid #e8ecf1;
+            border-top: none;
+            overflow: hidden;
+        }
+
+        .endpoint:last-child {
+            border-radius: 0 0 12px 12px;
+        }
+
+        .endpoint-header {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            flex-wrap: wrap;
+        }
+
+        .endpoint-header:hover {
+            background: #fafafa;
+        }
+
+        .endpoint-header .method {
+            font-weight: 700;
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 4px;
+            color: white;
+            text-transform: uppercase;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .method.get {
+            background: #3b82f6;
+        }
+        .method.post {
+            background: #10b981;
+        }
+        .method.put {
+            background: #f59e0b;
+        }
+        .method.delete {
+            background: #ef4444;
+        }
+        .method.patch {
+            background: #8b5cf6;
+        }
+
+        .endpoint-header .path {
+            font-family: monospace;
+            font-size: 16px;
+            color: #1a1a2e;
+            flex: 1;
+        }
+
+        .endpoint-header .summary {
+            color: #64748b;
+            font-size: 14px;
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .endpoint-header .arrow {
+            color: #94a3b8;
+            transition: 0.2s;
+            font-size: 18px;
+        }
+
+        .endpoint-header .arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .endpoint-body {
+            padding: 0 24px 24px 24px;
+            display: none;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .endpoint-body.open {
+            display: block;
+        }
+
+        /* ===== ДЕТАЛИ ЭНДПОИНТА ===== */
+        .detail-section {
+            margin-top: 16px;
+        }
+
+        .detail-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-section .description {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .param-table th {
+            text-align: left;
+            padding: 8px 12px;
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .param-table td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .param-table .required {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .code-block {
+            background: #1a1a2e;
+            color: #cdd6f4;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            margin-top: 8px;
+            position: relative;
+        }
+
+        .code-block .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .code-block .copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== ТЕСТИРОВАНИЕ ===== */
+        .test-area {
+            margin-top: 16px;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .test-area .form-group {
+            margin-bottom: 12px;
+        }
+
+        .test-area .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+
+        .test-area .form-group input,
+        .test-area .form-group textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: monospace;
+        }
+
+        .test-area .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .test-area .form-group input:focus,
+        .test-area .form-group textarea:focus {
+            border-color: #4f46e5;
+            outline: none;
+        }
+
+        .test-area .btn {
+            margin-right: 8px;
+            margin-top: 4px;
+        }
+
+        .test-response {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 6px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            display: none;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .test-response.visible {
+            display: block;
+        }
+
+        .test-response .status {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .test-response .status.success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .test-response .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .test-response pre {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px;
+            }
+            .header .logo h1 {
+                font-size: 18px;
+            }
+            .status-bar {
+                padding: 8px 16px;
+                font-size: 12px;
+                gap: 12px;
+            }
+            .container {
+                padding: 16px;
+            }
+            .endpoint-header {
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 12px 16px;
+            }
+            .endpoint-header .summary {
+                flex-basis: 100%;
+                margin-left: 76px;
+            }
+            .endpoint-body {
+                padding: 0 16px 16px 16px;
+            }
+            .info-block h2 {
+                font-size: 22px;
+            }
+            .param-table {
+                font-size: 13px;
+            }
+            .param-table th,
+            .param-table td {
+                padding: 6px 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header .badges .badge {
+                font-size: 10px;
+                padding: 2px 10px;
+            }
+            .btn {
+                font-size: 12px;
+                padding: 6px 14px;
+            }
+            .endpoint-header .method {
+                font-size: 11px;
+                min-width: 50px;
+                padding: 2px 8px;
+            }
+            .code-block {
+                font-size: 12px;
+                padding: 12px;
+            }
+        }
+
+        /* ===== АНИМАЦИЯ ЗАГРУЗКИ ===== */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .loading .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid #e2e8f0;
+            border-top-color: #4f46e5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1a1a2e;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            z-index: 9999;
+            transform: translateY(120px);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .toast.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: #10b981;
+        }
+        .toast.error {
+            background: #ef4444;
+        }
+        .toast.info {
+            background: #4f46e5;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== ШАПКА ===== -->
+    <header class="header">
+        <div class="logo">
+            <h1>📋 My<span>Swagger</span></h1>
+            <span class="version">v1.0</span>
+        </div>
+        <div class="badges">
+            <span class="badge green">✅ Live</span>
+            <span class="badge yellow">🔒 Auth Required</span>
+            <span class="badge blue">📦 OpenAPI 3.0</span>
+        </div>
+        <div class="actions">
+            <div class="user-status" id="userStatus">
+                <span class="dot offline" id="statusDot"></span>
+                <span id="statusText">Не авторизован</span>
+            </div>
+            <button class="btn btn-white" id="downloadBtn">📥 Скачать JSON</button>
+            <button class="btn btn-primary" id="refreshBtn">🔄 Обновить</button>
+            <a href="index.html" target="_blank" class="btn btn-outline">🚀 Приложение</a>
+        </div>
+    </header>
+
+    <!-- ===== СТАТУС-БАР ===== -->
+    <div class="status-bar">
+        <div class="item">📊 <strong>Всего эндпоинтов:</strong> <span class="count" id="totalEndpoints">0</span></div>
+        <div class="item">📝 <strong>Методы:</strong> GET <span class="count" id="getCount">0</span> POST <span class="count" id="postCount">0</span> PUT <span class="count" id="putCount">0</span> DELETE <span class="count" id="deleteCount">0</span></div>
+        <div class="item" style="margin-left:auto;">🏷️ <strong>Теги:</strong> <span id="tagList">—</span></div>
+    </div>
+
+    <!-- ===== КОНТЕЙНЕР ===== -->
+    <div class="container" id="app">
+        <!-- Контент будет сгенерирован JavaScript -->
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ================================================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ================================================================ -->
+    <script>
+        // ================================================================
+        // 1. ГЕНЕРАЦИЯ OPENAPI СПЕЦИФИКАЦИИ
+        // ================================================================
+        function generateOpenAPISpec() {
+            return {
+                openapi: "3.0.0",
+                info: {
+                    title: "TaskFlow API",
+                    description: "📋 Управление пользователями и профилями\n\n🔑 Тестовые данные: user@example.com / password123",
+                    version: "1.0.0",
+                    contact: {
+                        name: "TaskFlow Support",
+                        email: "support@taskflow.com"
+                    }
+                },
+                servers: [
+                    { url: window.location.origin + window.location.pathname.replace('my-swagger.html', ''), description: "Текущий сервер" },
+                    { url: "http://localhost:5500", description: "Live Server" }
+                ],
+                tags: [
+                    { name: "auth", description: "🔐 Авторизация" },
+                    { name: "profiles", description: "👥 Профили" },
+                    { name: "dashboard", description: "📊 Статистика" },
+                    { name: "session", description: "💾 Сессия" }
+                ],
+                components: {
+                    securitySchemes: {
+                        sessionAuth: {
+                            type: "apiKey",
+                            in: "header",
+                            name: "X-User-Email"
+                        }
+                    },
+                    schemas: {
+                        User: {
+                            type: "object",
+                            properties: {
+                                email: { type: "string", format: "email", example: "user@example.com" },
+                                name: { type: "string", example: "Иван Иванов" },
+                                password: { type: "string", format: "password", example: "password123" }
+                            },
+                            required: ["email", "password"]
+                        },
+                        Profile: {
+                            type: "object",
+                            properties: {
+                                id: { type: "integer", example: 1 },
+                                name: { type: "string", example: "Иван Иванов" },
+                                email: { type: "string", format: "email", example: "ivan@example.com" },
+                                phone: { type: "string", example: "+7 999 123-45-67" },
+                                website: { type: "string", example: "example.com" },
+                                createdBy: { type: "string", example: "user@example.com" },
+                                createdAt: { type: "string", format: "date-time", example: "2024-01-15T10:30:00Z" }
+                            },
+                            required: ["name", "email"]
+                        }
+                    }
+                },
+                paths: {
+                    "/users": {
+                        get: {
+                            tags: ["auth"],
+                            summary: "Получить всех пользователей",
+                            description: "Возвращает список всех зарегистрированных пользователей",
+                            responses: {
+                                "200": {
+                                    description: "Успешный ответ",
+                                    content: {
+                                        "application/json": {
+                                            example: [
+                                                { "email": "user@example.com", "name": "Тестовый Пользователь" },
+                                                { "email": "admin@example.com", "name": "Администратор" }
+                                            ]
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        post: {
+                            tags: ["auth"],
+                            summary: "Регистрация пользователя",
+                            description: "Создаёт нового пользователя. Email и пароль: 6-50 символов.",
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        example: { "email": "newuser@example.com", "name": "Новый Пользователь",
+                                            "password": "password123" }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "201": { description: "✅ Пользователь создан" },
+                                "400": { description: "❌ Ошибка валидации" },
+                                "409": { description: "❌ Пользователь уже существует" }
+                            }
+                        }
+                    },
+                    "/users/login": {
+                        post: {
+                            tags: ["auth"],
+                            summary: "Вход в систему",
+                            description: "Аутентификация пользователя",
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        example: { "email": "user@example.com", "password": "password123" }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "200": { description: "✅ Успешный вход" },
+                                "401": { description: "❌ Неверный логин или пароль" }
+                            }
+                        }
+                    },
+                    "/users/profile": {
+                        get: {
+                            tags: ["auth"],
+                            summary: "Получить профиль текущего пользователя",
+                            security: [{ sessionAuth: [] }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Данные пользователя",
+                                    content: {
+                                        "application/json": {
+                                            example: { "email": "user@example.com", "name": "Тестовый Пользователь" }
+                                        }
+                                    }
+                                },
+                                "401": { description: "❌ Не авторизован" }
+                            }
+                        },
+                        put: {
+                            tags: ["auth"],
+                            summary: "Обновить профиль пользователя",
+                            security: [{ sessionAuth: [] }],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        example: { "name": "Новое Имя", "email": "newemail@example.com",
+                                            "password": "newpassword123" }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "200": { description: "✅ Профиль обновлён" },
+                                "400": { description: "❌ Ошибка валидации" }
+                            }
+                        }
+                    },
+                    "/users/logout": {
+                        post: {
+                            tags: ["auth", "session"],
+                            summary: "Выход из системы",
+                            responses: {
+                                "200": { description: "✅ Выход выполнен" }
+                            }
+                        }
+                    },
+                    "/profiles": {
+                        get: {
+                            tags: ["profiles"],
+                            summary: "Получить все профили пользователя",
+                            security: [{ sessionAuth: [] }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Список профилей",
+                                    content: {
+                                        "application/json": {
+                                            example: [
+                                                { "id": 1, "name": "Иван Иванов", "email": "ivan@example.com",
+                                                    "phone": "+7 999 123-45-67" }
+                                            ]
+                                        }
+                                    }
+                                },
+                                "401": { description: "❌ Не авторизован" }
+                            }
+                        },
+                        post: {
+                            tags: ["profiles"],
+                            summary: "Создать новый профиль",
+                            security: [{ sessionAuth: [] }],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        example: { "name": "Иван Иванов", "email": "ivan@example.com",
+                                            "phone": "+7 999 123-45-67", "website": "example.com" }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "201": { description: "✅ Профиль создан" },
+                                "400": { description: "❌ Ошибка валидации" }
+                            }
+                        }
+                    },
+                    "/profiles/{id}": {
+                        get: {
+                            tags: ["profiles"],
+                            summary: "Получить профиль по ID",
+                            security: [{ sessionAuth: [] }],
+                            parameters: [
+                                { in: "path", name: "id", schema: { type: "integer" }, required: true,
+                                example: 1 }
+                            ],
+                            responses: {
+                                "200": {
+                                    description: "✅ Профиль найден",
+                                    content: {
+                                        "application/json": {
+                                            example: { "id": 1, "name": "Иван Иванов", "email": "ivan@example.com" }
+                                        }
+                                    }
+                                },
+                                "404": { description: "❌ Профиль не найден" }
+                            }
+                        },
+                        put: {
+                            tags: ["profiles"],
+                            summary: "Обновить профиль по ID",
+                            security: [{ sessionAuth: [] }],
+                            parameters: [
+                                { in: "path", name: "id", schema: { type: "integer" }, required: true,
+                                example: 1 }
+                            ],
+                            requestBody: {
+                                required: true,
+                                content: {
+                                    "application/json": {
+                                        example: { "name": "Обновлённое Имя", "email": "updated@example.com",
+                                            "phone": "+7 999 111-22-33" }
+                                    }
+                                }
+                            },
+                            responses: {
+                                "200": { description: "✅ Профиль обновлён" },
+                                "404": { description: "❌ Профиль не найден" }
+                            }
+                        },
+                        delete: {
+                            tags: ["profiles"],
+                            summary: "Удалить профиль по ID",
+                            security: [{ sessionAuth: [] }],
+                            parameters: [
+                                { in: "path", name: "id", schema: { type: "integer" }, required: true,
+                                example: 1 }
+                            ],
+                            responses: {
+                                "204": { description: "✅ Профиль удалён" },
+                                "404": { description: "❌ Профиль не найден" }
+                            }
+                        }
+                    },
+                    "/dashboard": {
+                        get: {
+                            tags: ["dashboard"],
+                            summary: "Получить статистику",
+                            security: [{ sessionAuth: [] }],
+                            responses: {
+                                "200": {
+                                    description: "✅ Статистика",
+                                    content: {
+                                        "application/json": {
+                                            example: { "totalProfiles": 5, "totalUsers": 3, "lastProfiles": [
+                                                    { "id": 1, "name": "Иван Иванов",
+                                                    "email": "ivan@example.com" }
+                                                ] }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        // ================================================================
+        // 2. ПОМОЩНИКИ
+        // ================================================================
+        function getCurrentUser() {
+            try {
+                const session = localStorage.getItem('taskflow_session');
+                return session ? JSON.parse(session) : null;
+            } catch { return null; }
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type}`;
+            toast.classList.add('visible');
+            clearTimeout(toast._timeout);
+            toast._timeout = setTimeout(() => toast.classList.remove('visible'), 3000);
+        }
+
+        function getMethodClass(method) {
+            const map = { get: 'get', post: 'post', put: 'put', delete: 'delete', patch: 'patch' };
+            return map[method.toLowerCase()] || 'get';
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ================================================================
+        // 3. РЕНДЕРИНГ SWAGGER
+        // ================================================================
+        function renderSwagger(spec) {
+            const app = document.getElementById('app');
+
+            // --- INFO ---
+            let html = `
+                <div class="info-block">
+                    <h2>${spec.info.title}</h2>
+                    <div class="description">
+                        ${spec.info.description.replace(/\n/g, '<br>')}
+                    </div>
+                    <div class="servers">
+                        ${spec.servers.map(s => `<span class="server">🌐 ${s.url}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+
+            // --- TAGS ---
+            const tags = spec.tags || [];
+            const paths = spec.paths || {};
+
+            // Группируем эндпоинты по тегам
+            const grouped = {};
+            Object.entries(paths).forEach(([path, methods]) => {
+                Object.entries(methods).forEach(([method, data]) => {
+                    const tag = data.tags?.[0] || 'default';
+                    if (!grouped[tag]) grouped[tag] = [];
+                    grouped[tag].push({ path, method, data });
+                });
+            });
+
+            // Рендерим каждый тег
+            tags.forEach(tag => {
+                const endpoints = grouped[tag.name] || [];
+                if (endpoints.length === 0) return;
+
+                html += `
+                    <div class="tag">
+                        <div class="tag-header">
+                            <h3>${tag.description || tag.name}</h3>
+                            <span class="tag-badge">${endpoints.length} эндпоинтов</span>
+                        </div>
+                        ${endpoints.map(ep => renderEndpoint(ep, spec)).join('')}
+                    </div>
+                `;
+            });
+
+            // Эндпоинты без тегов
+            if (grouped['default']) {
+                html += `
+                    <div class="tag">
+                        <div class="tag-header">
+                            <h3>📌 Прочее</h3>
+                            <span class="tag-badge">${grouped['default'].length} эндпоинтов</span>
+                        </div>
+                        ${grouped['default'].map(ep => renderEndpoint(ep, spec)).join('')}
+                    </div>
+                `;
+            }
+
+            app.innerHTML = html;
+
+            // Подсчёт статистики
+            updateStats(spec);
+
+            // Обновляем статус пользователя
+            updateUserStatus();
+
+            // Добавляем обработчики для раскрытия
+            document.querySelectorAll('.endpoint-header').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    // Игнорируем клики по кнопкам внутри
+                    if (e.target.closest('.btn') || e.target.closest('.copy-btn')) return;
+                    const body = this.nextElementSibling;
+                    const arrow = this.querySelector('.arrow');
+                    body.classList.toggle('open');
+                    if (arrow) arrow.classList.toggle('open');
+                });
+            });
+        }
+
+        // ================================================================
+        // 4. РЕНДЕРИНГ ОДНОГО ЭНДПОИНТА
+        // ================================================================
+        function renderEndpoint(ep, spec) {
+            const { path, method, data } = ep;
+            const methodClass = getMethodClass(method);
+            const params = data.parameters || [];
+            const requestBody = data.requestBody;
+            const responses = data.responses || {};
+
+            let html = `
+                <div class="endpoint">
+                    <div class="endpoint-header">
+                        <span class="method ${methodClass}">${method.toUpperCase()}</span>
+                        <span class="path">${path}</span>
+                        <span class="summary">${data.summary || ''}</span>
+                        <span class="arrow">▼</span>
+                    </div>
+                    <div class="endpoint-body">
+                        ${data.description ? `<div class="detail-section"><div class="description">${data.description}</div></div>` : ''}
+            `;
+
+            // --- Параметры ---
+            if (params.length > 0) {
+                html += `
+                    <div class="detail-section">
+                        <h4>📌 Параметры</h4>
+                        <table class="param-table">
+                            <thead>
+                                <tr>
+                                    <th>Имя</th>
+                                    <th>Тип</th>
+                                    <th>Обязательный</th>
+                                    <th>Описание</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${params.map(p => `
+                                    <tr>
+                                        <td><code>${p.name}</code></td>
+                                        <td>${p.schema?.type || 'string'}</td>
+                                        <td>${p.required ? '<span class="required">✅</span>' : '—'}</td>
+                                        <td>${p.description || ''}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+
+            // --- Request Body ---
+            if (requestBody) {
+                const example = requestBody.content?.['application/json']?.example ||
+                    requestBody.content?.['application/json']?.schema?.example ||
+                    '{\n  "key": "value"\n}';
+
+                html += `
+                    <div class="detail-section">
+                        <h4>📤 Тело запроса</h4>
+                        <div class="code-block">
+                            ${typeof example === 'object' ? JSON.stringify(example, null, 2) : example}
+                            <button class="copy-btn" onclick="copyText(this)">📋 Копировать</button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // --- Responses ---
+            html += `
+                <div class="detail-section">
+                    <h4>📥 Ответы</h4>
+                    ${Object.entries(responses).map(([code, resp]) => `
+                        <div style="margin-bottom:8px; padding:8px 12px; background:#f8fafc; border-radius:6px; border-left:3px solid ${code.startsWith('2') ? '#10b981' : code.startsWith('4') ? '#ef4444' : '#f59e0b'};">
+                            <strong style="font-size:14px;">${code}</strong>
+                            <span style="color:#64748b; margin-left:8px;">${resp.description || ''}</span>
+                            ${resp.content?.['application/json']?.example ? `
+                                <div class="code-block" style="margin-top:4px; background:#f1f5f9; color:#1a1a2e;">
+                                    ${JSON.stringify(resp.content['application/json'].example, null, 2)}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            // --- Тестирование ---
+            html += `
+                <div class="detail-section">
+                    <h4>🧪 Тестирование API</h4>
+                    <div class="test-area">
+                        ${params.filter(p => p.in === 'path').map(p => `
+                            <div class="form-group">
+                                <label>${p.name} ${p.required ? '*' : ''}</label>
+                                <input type="text" id="param_${p.name}" placeholder="${p.schema?.example || ''}" value="${p.schema?.example || ''}">
+                            </div>
+                        `).join('')}
+                        
+                        ${requestBody ? `
+                            <div class="form-group">
+                                <label>Тело запроса (JSON)</label>
+                                <textarea id="requestBody">${typeof requestBody.content?.['application/json']?.example === 'object' ? JSON.stringify(requestBody.content['application/json'].example, null, 2) : requestBody.content?.['application/json']?.example || '{\n  "key": "value"\n}'}</textarea>
+                            </div>
+                        ` : ''}
+                        
+                        <button class="btn btn-success" onclick="testEndpoint(this, '${path}', '${method}')">🚀 Отправить запрос</button>
+                        <button class="btn btn-outline" style="background:#f8fafc; color:#475569; border:1px solid #e2e8f0;" onclick="clearResponse(this)">🗑 Очистить</button>
+                        
+                        <div class="test-response" id="response_${path.replace(/\//g, '_')}_${method}">
+                            <div class="status" id="status_${path.replace(/\//g, '_')}_${method}"></div>
+                            <pre id="body_${path.replace(/\//g, '_')}_${method}"></pre>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            html += `</div></div>`;
+            return html;
+        }
+
+        // ================================================================
+        // 5. ТЕСТИРОВАНИЕ API
+        // ================================================================
+        window.testEndpoint = async function(btn, path, method) {
+            const container = btn.closest('.test-area');
+            const responseEl = container.querySelector('.test-response');
+            const statusEl = container.querySelector('.status');
+            const bodyEl = container.querySelector('pre');
+
+            // Собираем параметры из URL
+            let url = path;
+            const params = container.querySelectorAll('.form-group input');
+            params.forEach(input => {
+                const key = input.id.replace('param_', '');
+                if (input.value) {
+                    url = url.replace(`{${key}}`, input.value);
+                }
+            });
+
+            // Получаем тело запроса
+            let body = null;
+            const bodyTextarea = container.querySelector('#requestBody');
+            if (bodyTextarea) {
+                try {
+                    body = JSON.parse(bodyTextarea.value);
+                } catch (e) {
+                    showToast('❌ Неверный JSON в теле запроса', 'error');
+                    return;
+                }
+            }
+
+            // Получаем URL сервера
+            const spec = generateOpenAPISpec();
+            const baseUrl = spec.servers[0]?.url || window.location.origin;
+            const fullUrl = baseUrl + url;
+
+            // Показываем загрузку
+            responseEl.className = 'test-response visible';
+            statusEl.className = 'status';
+            statusEl.textContent = '⏳ Загрузка...';
+            statusEl.style.background = '#eef2ff';
+            statusEl.style.color = '#4f46e5';
+            bodyEl.textContent = '';
+
+            btn.disabled = true;
+            btn.textContent = '⏳ Отправка...';
+
+            try {
+                const options = {
+                    method: method.toUpperCase(),
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+
+                // Добавляем пользователя из сессии
+                const user = getCurrentUser();
+                if (user) {
+                    options.headers['X-User-Email'] = user.email;
+                }
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(fullUrl, options);
+                const data = await response.json();
+
+                // Показываем результат
+                const isSuccess = response.ok;
+                statusEl.className = `status ${isSuccess ? 'success' : 'error'}`;
+                statusEl.textContent = `${response.status} ${response.statusText}`;
+                bodyEl.textContent = JSON.stringify(data, null, 2);
+
+                showToast(`${isSuccess ? '✅' : '❌'} ${response.status} ${response.statusText}`, isSuccess ? 'success' :
+                    'error');
+
+            } catch (error) {
+                statusEl.className = 'status error';
+                statusEl.textContent = '❌ Ошибка сети';
+                bodyEl.textContent = error.message;
+                showToast('❌ Ошибка при выполнении запроса', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚀 Отправить запрос';
+            }
+        };
+
+        window.clearResponse = function(btn) {
+            const container = btn.closest('.test-area');
+            const responseEl = container.querySelector('.test-response');
+            responseEl.className = 'test-response';
+        };
+
+        window.copyText = function(btn) {
+            const code = btn.closest('.code-block');
+            const text = code.textContent.replace('📋 Копировать', '').trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const original = btn.textContent;
+                btn.textContent = '✅ Скопировано!';
+                setTimeout(() => btn.textContent = original, 1500);
+            });
+        };
+
+        // ================================================================
+        // 6. СТАТИСТИКА
+        // ================================================================
+        function updateStats(spec) {
+            const paths = spec.paths || {};
+            let total = 0,
+                get = 0,
+                post = 0,
+                put = 0,
+                del = 0;
+
+            Object.values(paths).forEach(path => {
+                Object.keys(path).forEach(method => {
+                    total++;
+                    if (method === 'get') get++;
+                    if (method === 'post') post++;
+                    if (method === 'put') put++;
+                    if (method === 'delete') del++;
+                });
+            });
+
+            document.getElementById('totalEndpoints').textContent = total;
+            document.getElementById('getCount').textContent = get;
+            document.getElementById('postCount').textContent = post;
+            document.getElementById('putCount').textContent = put;
+            document.getElementById('deleteCount').textContent = del;
+            document.getElementById('tagList').textContent = (spec.tags || []).map(t => t.name).join(', ');
+        }
+
+        // ================================================================
+        // 7. СТАТУС ПОЛЬЗОВАТЕЛЯ
+        // ================================================================
+        function updateUserStatus() {
+            const user = getCurrentUser();
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+
+            if (user) {
+                dot.className = 'dot online';
+                text.textContent = `✅ ${user.name || user.email}`;
+            } else {
+                dot.className = 'dot offline';
+                text.textContent = '🔒 Не авторизован';
+            }
+        }
+
+        // ================================================================
+        // 8. СКАЧИВАНИЕ
+        // ================================================================
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const spec = generateOpenAPISpec();
+            const json = JSON.stringify(spec, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'swagger.json';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('✅ Файл swagger.json скачан!', 'success');
+        });
+
+        // ================================================================
+        // 9. ОБНОВЛЕНИЕ
+        // ================================================================
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            const spec = generateOpenAPISpec();
+            renderSwagger(spec);
+            showToast('🔄 Swagger обновлён', 'info');
+        });
+
+        // ================================================================
+        // 10. ЗАПУСК
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            const spec = generateOpenAPISpec();
+            renderSwagger(spec);
+            console.log('📚 Мой Swagger загружен');
+            console.log(`📊 Всего эндпоинтов: ${document.getElementById('totalEndpoints').textContent}`);
+        });
+
+        // Автообновление статуса
+        setInterval(updateUserStatus, 2000);
+    </script>
+
+</body>
+</html>
