@@ -189,16 +189,12 @@ app.get('/dashboard', (req, res) => {
 // ============================================================
 
 const PORT = process.env.PORT || 3000;
-const server = app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Сервер запущен на порту ${PORT}`);
     console.log(`🔑 Тестовый вход: user@example.com / password123`);
 });
 
-// Обработчик корректного завершения
-process.on('SIGTERM', () => {
-    console.log('SIGTERM received, closing server...');
-    server.close(() => {
-        console.log('Server closed');
-        process.exit(0);
-    });
-});
+// Держим процесс активным
+setInterval(() => {
+    // Просто ничего не делаем, но процесс жив
+}, 60000);
